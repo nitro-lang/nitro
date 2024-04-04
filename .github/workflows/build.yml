@@ -1,6 +1,8 @@
 name: Build/release
 
-on: push
+on:
+  release:
+    types: [published]
 
 jobs:
   release:
@@ -19,6 +21,6 @@ jobs:
         run: pip install pyinstaller
       - name: build
         run: pyinstaller --onefile nitro.py
-      - name: dir check
-        run: cd dist && dir
+      - name: publish
+        run: gh release upload ${{github.event.release.tag_name}} dist/nitro
           
