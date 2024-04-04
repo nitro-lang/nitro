@@ -20,7 +20,9 @@ jobs:
       - name: install requirements
         run: pip install pyinstaller
       - name: build
-        run: pyinstaller --onefile nitro.py
+        run: |
+          pyinstaller --onefile nitro.py
+          ls
       - name: publish
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
