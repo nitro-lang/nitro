@@ -19,4 +19,6 @@ jobs:
         run: pip install pyinstaller
       - name: build
         run: pyinstaller --onefile nitro.py
+      - name: dir check
+        run: dir
           
