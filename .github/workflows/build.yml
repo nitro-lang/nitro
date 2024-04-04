@@ -16,5 +16,5 @@ jobs:
       - name: install requirements
         run: pip install pyinstaller
       - name: build
-        run: pyinstaller --onefile myscript.py
+        run: pyinstaller --onefile nitro.py
           
