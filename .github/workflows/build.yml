@@ -23,8 +23,15 @@ jobs:
       - name: build
         run: |
           pyinstaller --onefile nitro.py -n nitro-${{ runner.os }}
-      - name: publish
+      - name: publish for windows
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh release upload ${{github.event.release.tag_name}} dist/nitro-${{ runner.os }}
-          
+        if: runner.os == 'Windows'
+        run: |
+            gh release upload ${{github.event.release.tag_name}} dist/nitro-${{ runner.os }}.exe
+      - name: publish for ubuntu and macos
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        if: runner.os == 'Windows'
+        run: |
+            gh release upload ${{github.event.release.tag_name}} dist/nitro-${{ runner.os }}.exe         
