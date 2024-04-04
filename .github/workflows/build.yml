@@ -22,6 +22,7 @@ jobs:
       - name: build
         run: |
           pyinstaller --onefile nitro.py
+          cd dist
           ls
       - name: publish
         env:
