@@ -15,6 +15,12 @@ jobs:
     steps:
       - name: checkout repo content
         uses: actions/checkout@v2 # checkout the repository content
+      - name: Install GitHub CLI
+        run: |
+          sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-key C99B11DEB97541F0
+          sudo apt-add-repository https://cli.github.com/packages
+          sudo apt update
+          sudo apt install gh
       - name: setup Python
         uses: actions/setup-python@v5.1.0
       - name: install requirements
@@ -22,7 +28,7 @@ jobs:
       - name: build
         run: pyinstaller --onefile nitro.py
       - name: publish
-        run: gh release upload ${{github.event.release.tag_name}} dist/nitro
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release upload ${{github.event.release.tag_name}} dist/nitro
           
