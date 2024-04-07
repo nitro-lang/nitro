@@ -4,8 +4,9 @@ class NitroVisitor():
 
         print(tree)
 
+
         if isinstance(tree[0],tuple):
-            self.process(tree[0])
+            return self.process(tree[0])
 
         else:
             match tree[0]:
@@ -17,6 +18,7 @@ class NitroVisitor():
                     return self.mul(tree[1],tree[2])
                 case "div":
                     return self.div(tree[1],tree[2])
+
 
     def add(self,left,right):
         if isinstance(left,tuple):

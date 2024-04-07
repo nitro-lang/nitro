@@ -1,18 +1,19 @@
 from sly import Lexer
 
 class NitroLexer(Lexer):
+
     # token names
     tokens = { ID, NUMBER, PLUS, MINUS, ASTERISK, SLASH, POWER, ASSIGN, LPAREN, RPAREN, SEMICOLON }
 
     # ignore whitespace
-    ignore = ' \t'
+    ignore = ' \t\n'
 
     # ignore comment
     ignore_comment = r'\#.*'
 
     # regular expression rules for tokens
     ID          = r'[a-zA-Z_][a-zA-Z0-9_]*'
-    NUMBER      = r'\d+'
+    NUMBER      = (r'\d+\.\d+',r'\d+')
     PLUS        = r'\+'
     MINUS       = r'-'
     ASTERISK    = r'\*'
@@ -23,9 +24,12 @@ class NitroLexer(Lexer):
     RPAREN      = r'\)'
     SEMICOLON   = r'\;'
 
-    @_(r'\d+')
+    @_(r'\d+\.\d+',r'\d+')
     def NUMBER(self, t):
-        t.value = int(t.value)   # Convert to a numeric value
+        if "." in t.value:
+            t.value = float(t.value)    
+        else:
+            t.value = int(t.value)   # Convert to a numeric value
         return t
     
     @_(r'\n+')

@@ -1,17 +1,31 @@
 from sly import Parser
 from nitro_lexer import NitroLexer
+import logging
+
+instructions = []
 
 class NitroParser(Parser):
-    # Get the token list from the lexer (required)
+
+    log = logging.getLogger()
+    log.disabled = True
+
     tokens = NitroLexer.tokens
 
     precedence = (
-          ('nonassoc', SEMICOLON),  # Nonassociative operators
+          ('nonassoc', SEMICOLON),
           ('left', PLUS, MINUS),
           ('left', ASTERISK, SLASH)
     )
 
     # Grammar rules and actions
+
+    @_('expr SEMICOLON')
+    def instruction(self, p):
+        instructions.append(p.expr)
+
+    @_('instruction instruction')
+    def expr(self, p):
+        instructions.extend([p.instruction0,p.instruction1])
 
     @_('expr PLUS expr')
     def expr(self, p):
@@ -36,7 +50,3 @@ class NitroParser(Parser):
     @_('LPAREN expr RPAREN')
     def expr(self, p):
         return p.expr
-
-    @_('expr SEMICOLON expr')
-    def expr(self, p):
-        return (p.expr0,p.expr1)
