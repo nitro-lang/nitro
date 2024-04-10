@@ -1,8 +1,8 @@
-from sly import Parser
+from nitro_globals import *
 from nitro_lexer import NitroLexer
+from sly import Parser
 import logging
 
-instructions = []
 
 class NitroParser(Parser):
 
@@ -19,34 +19,63 @@ class NitroParser(Parser):
 
     # Grammar rules and actions
 
+    def error(self, p):
+        if p:
+            self.errok()
+        else:
+            print(f"{warning_color}WARNING{reset_color} : Reached error EOF")
+
+    
     @_('expr SEMICOLON')
     def instruction(self, p):
-        instructions.append(p.expr)
+        return [p[0]]
+    
+    @_('function')
+    def instruction(self, p):
+        return [p[0]]
 
     @_('instruction instruction')
-    def expr(self, p):
-        instructions.extend([p.instruction0,p.instruction1])
+    def instruction(self, p):
+        return p[0] + p[1]
+    
+    @_('expr COMMA')
+    def parameter(self, p):
+        return [p[0]]
+
+    @_('parameter parameter')
+    def parameter(self, p):
+        return p[0] + p[1]
 
     @_('expr PLUS expr')
     def expr(self, p):
-        return ("add",p.expr0,p.expr1)
+        return ("add",p[0],p[2])
 
     @_('expr MINUS expr')
     def expr(self, p):
-        return ("sub",p.expr0,p.expr1)
+        return ("sub",p[0],p[2])
 
     @_('expr ASTERISK expr')
     def expr(self, p):
-        return ("mul",p.expr0,p.expr1)
+        return ("mul",p[0],p[2])
 
     @_('expr SLASH expr')
     def expr(self, p):
-        return ("div",p.expr0,p.expr1)
+        return ("div",p[0],p[2])
 
     @_('NUMBER')
     def expr(self, p):
-        return p.NUMBER
+        return p[0]
 
     @_('LPAREN expr RPAREN')
     def expr(self, p):
-        return p.expr
+        return p[0]
+
+    @_('FUNC ID LPAREN RPAREN LBRACE instruction RBRACE')
+    def function(self, p):
+        return ("func",p[1],None,p[5])
+    
+    @_('FUNC ID LPAREN ID RPAREN LBRACE instruction RBRACE')
+    def function(self, p):
+        return ("func",p[1],p[3],p[6])
+    
+

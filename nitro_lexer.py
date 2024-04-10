@@ -3,10 +3,10 @@ from sly import Lexer
 class NitroLexer(Lexer):
 
     # token names
-    tokens = { ID, NUMBER, PLUS, MINUS, ASTERISK, SLASH, POWER, ASSIGN, LPAREN, RPAREN, SEMICOLON }
+    tokens = { ID, NUMBER, PLUS, MINUS, ASTERISK, SLASH, POWER, ASSIGN, LPAREN, RPAREN, LBRACE, RBRACE, COLON, COMMA, SEMICOLON, IF, FOR, WHILE, VAR, FUNC }
 
     # ignore whitespace
-    ignore = ' \t\n'
+    ignore = ' \t\n\r'
 
     # ignore comment
     ignore_comment = r'\#.*'
@@ -22,7 +22,17 @@ class NitroLexer(Lexer):
     ASSIGN      = r'='
     LPAREN      = r'\('
     RPAREN      = r'\)'
+    LBRACE      = r'\{'
+    RBRACE      = r'\}'
+    COLON       = r'\:'
+    COMMA       = r'\,'
     SEMICOLON   = r'\;'
+
+    ID['if'] = IF
+    ID['for'] = FOR
+    ID['while'] = WHILE
+    ID['var'] = VAR
+    ID['func'] = FUNC
 
     @_(r'\d+\.\d+',r'\d+')
     def NUMBER(self, t):

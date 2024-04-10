@@ -1,3 +1,2 @@
-pyinstaller
 llvmlite
 sly
