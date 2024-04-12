@@ -1,6 +1,6 @@
 from llvmlite import ir
-import llvmlite.binding as binding
-
+from llvmlite import binding
+from std.nitro_builtin import *
 
 class NitroVisitor():
 
@@ -8,6 +8,7 @@ class NitroVisitor():
 
         self.module = ir.Module(name)
         self.builder = None
+        self.functions = {}
 
     def process(self,builder,tree):
 
@@ -26,29 +27,31 @@ class NitroVisitor():
                     return self.div(tree[1],tree[2])
                 case "func":
                     return self.func(tree[1],tree[2],tree[3])
+                case "call":
+                    return self.call(builder,tree[1],tree[2])
 
 
     def add(self,builder,left,right):
         if isinstance(left,tuple):
-            left_value = self.process(left)
+            left_value = self.process(builder,left)
         else: left_value = left
 
         if isinstance(right,tuple):
-            right_value = self.process(right)
+            right_value = self.process(builder,right)
         else: right_value = right
 
-        builder.add(ir.Constant(ir.IntType(32),left_value),ir.Constant(ir.IntType(32),right_value))
+        return builder.add(ir.Constant(ir.IntType(32),left_value),ir.Constant(ir.IntType(32),right_value))
     
     def sub(self,builder,left,right):
         if isinstance(left,tuple):
-            left_value = self.process(left)
+            left_value = self.process(builder,left)
         else: left_value = left
 
         if isinstance(right,tuple):
-            right_value = self.process(right)
+            right_value = self.process(builder,right)
         else: right_value = right
 
-        builder.sub(ir.Constant(ir.IntType(32),left_value),ir.Constant(ir.IntType(32),right_value))
+        return builder.sub(ir.Constant(ir.IntType(32),left_value),ir.Constant(ir.IntType(32),right_value))
     
     def mul(self,left,right):
         if isinstance(left,tuple):
@@ -82,6 +85,8 @@ class NitroVisitor():
         function_type = ir.FunctionType(return_type,())
         function = ir.Function(self.module, function_type, name=id)
 
+        self.functions[id] = function
+
         block = function.append_basic_block(name="entry")
         builder = ir.IRBuilder(block)
         
@@ -90,7 +95,17 @@ class NitroVisitor():
 
         builder.ret_void()
 
+    def call(self,builder : ir.IRBuilder,id,expr):
 
+        if isinstance(expr,tuple):
+            epxr_value = self.process(expr)
+        else: expr_value = expr
+
+        if id in builtin_functions:
+            builtin_functions[id](builder,self.module,expr)
+
+        else:
+            builder.call(self.functions[id], [])
 
 
 

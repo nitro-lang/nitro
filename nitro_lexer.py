@@ -3,7 +3,7 @@ from sly import Lexer
 class NitroLexer(Lexer):
 
     # token names
-    tokens = { ID, NUMBER, PLUS, MINUS, ASTERISK, SLASH, POWER, ASSIGN, LPAREN, RPAREN, LBRACE, RBRACE, COLON, COMMA, SEMICOLON, IF, FOR, WHILE, VAR, FUNC }
+    tokens = { ID, NUMBER, STRING, PLUS, MINUS, ASTERISK, SLASH, POWER, ASSIGN, LPAREN, RPAREN, LBRACE, RBRACE, COLON, COMMA, SEMICOLON, IF, FOR, WHILE, VAR, FUNC }
 
     # ignore whitespace
     ignore = ' \t\n\r'
@@ -14,6 +14,7 @@ class NitroLexer(Lexer):
     # regular expression rules for tokens
     ID          = r'[a-zA-Z_][a-zA-Z0-9_]*'
     NUMBER      = (r'\d+\.\d+',r'\d+')
+    STRING      = r'\".*?\"'
     PLUS        = r'\+'
     MINUS       = r'-'
     ASTERISK    = r'\*'
@@ -39,7 +40,14 @@ class NitroLexer(Lexer):
         if "." in t.value:
             t.value = float(t.value)    
         else:
-            t.value = int(t.value)   # Convert to a numeric value
+            t.value = int(t.value)
+        return t
+
+    @_(r'\".*\"')
+    def STRING(self, t):
+        t.value = t.value.strip('"')
+        t.value = t.value.replace('\\n',"\n")
+        t.value = t.value + "\0"
         return t
     
     @_(r'\n+')

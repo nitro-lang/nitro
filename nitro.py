@@ -2,8 +2,10 @@ from nitro_globals import *
 from nitro_lexer import *
 from nitro_parser import *
 from nitro_visitor import *
+from llvmlite import binding
 import time
 import argparse
+from ctypes import CFUNCTYPE
 
 
 if __name__ == "__main__":
@@ -34,6 +36,8 @@ if __name__ == "__main__":
             tokens = lexer.tokenize(code)
             instructions = parser.parse(tokens)
 
+            print(instructions)
+
             if instructions == None:
                 raise SystemExit(f"{error_color}ERROR{reset_color} : No statement found")
 
@@ -51,17 +55,31 @@ if __name__ == "__main__":
 
             end = time.perf_counter()
 
-            print(f"--- process took {end - start:0.4f} seconds ---")
+            print(f"--- compilation process took {end - start:0.4f} seconds ---")
 
-            if args.o == None:
-                output = "out"
+            if args.o != None:
+                open(f"{args.o}.ll","w").write(str(visitor.module))
+                print(f"{success_color}SUCCESS{reset_color} : Program is written to \"{args.o}.ll\"")
 
-            else: output = args.o
+            binding.initialize()
+            binding.initialize_native_target()
+            binding.initialize_native_asmprinter()
 
-            open(f"{output}.o","w").write(str(visitor.module))
-            print(f"{success_color}SUCCESS{reset_color} : Program is written to \"{output}.o\"")
 
-            visitor.module
+            llvm_module = binding.parse_assembly(str(visitor.module)) 
+            tm = binding.Target.from_default_triple().create_target_machine() 
+
+            with binding.create_mcjit_compiler(llvm_module, tm) as mcjit:
+                def on_compiled(module, objbytes):
+                    open(f'{args.o}.o', 'wb').write(objbytes)
+
+                mcjit.set_object_cache(on_compiled, lambda m: None)
+                mcjit.finalize_object()
+                fptr = mcjit.get_function_address("main")
+                py_func = CFUNCTYPE(None)(fptr)
+                py_func()
+
+            
 
         else:
             print(f"File \'{args.file}\' is empty")
