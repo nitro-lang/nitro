@@ -9,7 +9,7 @@ nitro is a general purpose jit compiled language programming language built usin
 ```
 # test program
 
-var a : int = 2;
+var a : int32 = 2;
 var b : float = 4.2;
 
 func test(x:int,y:float) : float {
