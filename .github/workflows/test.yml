@@ -18,6 +18,6 @@ jobs:
       - name: install requirements
         run: pip install -r requirements.txt
       - name: build
-        run: pyinstaller --onefile nitro.py -n nitro-${{ runner.os }}
+        run: PYTHONOPTIMIZE=2 pyinstaller --onefile nitro.py -n nitro-${{ runner.os }}
           
        
