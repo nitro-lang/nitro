@@ -21,7 +21,7 @@ jobs:
       - name:  install requirements
         run: pip install -r requirements.txt
       - name: build
-        run: PYTHONOPTIMIZE=2 pyinstaller --onefile nitro.py -n nitro-${{ runner.os }}
+        run: pyinstaller --onefile nitro.py -n nitro-${{ runner.os }}
       - name: publish for windows
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
