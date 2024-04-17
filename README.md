@@ -16,7 +16,10 @@ func test(x:int,y:float) : float {
   return x + y * 2;
 }
 
-print(test(a,b));
+func main() {
+  print(test(a,b));
+}
+
 ```
 
 nitro focuses on speed and optimization for more efficient software 
