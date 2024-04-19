@@ -36,7 +36,7 @@ if __name__ == "__main__":
             tokens = lexer.tokenize(code)
             instructions = parser.parse(tokens)
 
-            print(instructions)
+            #print(instructions)
 
             if instructions == None:
                 raise SystemExit(f"{error_color}ERROR{reset_color} : No statement found")

@@ -30,10 +30,10 @@ class NitroParser(Parser):
     def instruction(self, p):
         return [p[0]]
     
-    @_('call')
+    @_('var SEMICOLON')
     def instruction(self, p):
         return [p[0]]
-    
+        
     @_('function')
     def instruction(self, p):
         return [p[0]]
@@ -76,7 +76,23 @@ class NitroParser(Parser):
 
     @_('LPAREN expr RPAREN')
     def expr(self, p):
-        return p[0]
+        return p[1]
+
+    @_('VAR ID')
+    def var(self, p):
+        return ("var",p[1],None,None)
+    
+    @_('VAR ID COLON ID')
+    def var(self, p):
+        return ("var",p[1],None,p[3])
+
+    @_('VAR ID ASSIGN expr')
+    def var(self, p):
+        return ("var",p[1],p[3],None)
+    
+    @_('VAR ID COLON ID ASSIGN expr')
+    def var(self, p):
+        return ("var",p[1],p[5],p[3])
 
     @_('expr')
     def argument(self, p):
@@ -98,11 +114,15 @@ class NitroParser(Parser):
     def function(self, p):
         return ("func",p[1],p[3],p[6])
     
-    @_('ID LPAREN expr RPAREN SEMICOLON')
-    def call(self, p):
+    @_('ID LPAREN argument RPAREN')
+    def expr(self, p):
         return ("call",p[0],p[2])
-    @_('ID LPAREN RPAREN SEMICOLON')
-    def call(self, p):
+
+    @_('ID LPAREN RPAREN')
+    def expr(self, p):
         return ("call",p[0],None)
     
-
+    @_('ID')
+    def expr(self, p):
+        return ("get",p[0])
+    
